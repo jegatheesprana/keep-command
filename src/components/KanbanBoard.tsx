@@ -115,7 +115,7 @@ export function KanbanBoard() {
 
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
-    const [leftColumn, setLeftColumn] = useState<string | null>(null);
+    const [activeColumn, setActiveColumn] = useState<string | null>(null);
 
     const [activeTask, setActiveTask] = useState<Task | null>(null);
 
@@ -240,17 +240,17 @@ export function KanbanBoard() {
             {"document" in window &&
                 createPortal(
                     <DragOverlay>
-                        {leftColumn === ColumnType.Category ? (
+                        {activeColumn === ColumnType.Category ? (
                             <BoardColumn
                                 isOverlay
                                 column={categoryColumn}
-                                tasks={tasks.filter((task) => task.columnId === leftColumn)}
+                                tasks={tasks.filter((task) => task.columnId === activeColumn)}
                             />
-                        ) : leftColumn === ColumnType.Command ? (
+                        ) : activeColumn === ColumnType.Command ? (
                             <BoardColumn
                                 isOverlay
                                 column={commandColumn}
-                                tasks={tasks.filter((task) => task.columnId === leftColumn)}
+                                tasks={tasks.filter((task) => task.columnId === activeColumn)}
                             />
                         ) : null}
                         {activeTask && <TaskCard task={activeTask} isOverlay />}
@@ -264,7 +264,7 @@ export function KanbanBoard() {
         if (!hasDraggableData(event.active)) return;
         const data = event.active.data.current;
         if (data?.type === "Column") {
-            setLeftColumn(data.column.id);
+            setActiveColumn(data.column.id);
             return;
         }
 
@@ -275,7 +275,7 @@ export function KanbanBoard() {
     }
 
     function onDragEnd(event: DragEndEvent) {
-        setLeftColumn(null);
+        setActiveColumn(null);
         setActiveTask(null);
 
         const { active, over } = event;
