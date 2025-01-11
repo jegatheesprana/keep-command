@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import { BoardColumn, BoardContainer } from "./BoardColumn";
@@ -109,9 +109,8 @@ const initialTasks: Task[] = [
     },
 ];
 export function KanbanBoard() {
-    const [columns, setColumns] = useState<Column[]>([categoryColumn, commandColumn] satisfies Column[]);
+    const [leftColumn, setLeftColumn] = useState<ColumnType>(ColumnType.Category);
     const pickedUpTaskColumn = useRef<ColumnType | null>(null);
-    const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
@@ -130,7 +129,7 @@ export function KanbanBoard() {
     function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnType) {
         const tasksInColumn = tasks.filter((task) => task.columnId === columnId);
         const taskPosition = tasksInColumn.findIndex((task) => task.id === taskId);
-        const column = columns.find((col) => col.id === columnId);
+        const column = columnId === ColumnType.Category ? categoryColumn : commandColumn;
         return {
             tasksInColumn,
             taskPosition,
@@ -142,11 +141,8 @@ export function KanbanBoard() {
         onDragStart({ active }) {
             if (!hasDraggableData(active)) return;
             if (active.data.current?.type === "Column") {
-                const startColumnIdx = columnsId.findIndex((id) => id === active.id);
-                const startColumn = columns[startColumnIdx];
-                return `Picked up Column ${startColumn?.title} at position: ${startColumnIdx + 1} of ${
-                    columnsId.length
-                }`;
+                const startColumn = active.id === ColumnType.Category ? categoryColumn : commandColumn;
+                return `Picked up Column ${startColumn?.title} at position: ${active.id}`;
             } else if (active.data.current?.type === "Task") {
                 pickedUpTaskColumn.current = active.data.current.task.columnId;
                 const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
@@ -162,10 +158,7 @@ export function KanbanBoard() {
             if (!hasDraggableData(active) || !hasDraggableData(over)) return;
 
             if (active.data.current?.type === "Column" && over.data.current?.type === "Column") {
-                const overColumnIdx = columnsId.findIndex((id) => id === over.id);
-                return `Column ${active.data.current.column.title} was moved over ${
-                    over.data.current.column.title
-                } at position ${overColumnIdx + 1} of ${columnsId.length}`;
+                return `Column ${active.data.current.column.title} was moved over ${over.data.current.column.title} at position ${over.id}`;
             } else if (active.data.current?.type === "Task" && over.data.current?.type === "Task") {
                 const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
                     over.id,
@@ -187,11 +180,7 @@ export function KanbanBoard() {
                 return;
             }
             if (active.data.current?.type === "Column" && over.data.current?.type === "Column") {
-                const overColumnPosition = columnsId.findIndex((id) => id === over.id);
-
-                return `Column ${active.data.current.column.title} was dropped into position ${
-                    overColumnPosition + 1
-                } of ${columnsId.length}`;
+                return `Column ${active.data.current.column.title} was dropped into position over.id`;
             } else if (active.data.current?.type === "Task" && over.data.current?.type === "Task") {
                 const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
                     over.id,
@@ -226,14 +215,30 @@ export function KanbanBoard() {
             onDragOver={onDragOver}
         >
             <BoardContainer>
-                <SortableContext items={columnsId}>
-                    {columns.map((col) => (
-                        <BoardColumn
-                            key={col.id}
-                            column={col}
-                            tasks={tasks.filter((task) => task.columnId === col.id)}
-                        />
-                    ))}
+                <SortableContext items={[ColumnType.Category, ColumnType.Command]}>
+                    {leftColumn === ColumnType.Category ? (
+                        <>
+                            <BoardColumn
+                                column={categoryColumn}
+                                tasks={tasks.filter((task) => task.columnId === ColumnType.Category)}
+                            />
+                            <BoardColumn
+                                column={commandColumn}
+                                tasks={tasks.filter((task) => task.columnId === ColumnType.Command)}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <BoardColumn
+                                column={commandColumn}
+                                tasks={tasks.filter((task) => task.columnId === ColumnType.Command)}
+                            />
+                            <BoardColumn
+                                column={categoryColumn}
+                                tasks={tasks.filter((task) => task.columnId === ColumnType.Category)}
+                            />
+                        </>
+                    )}
                 </SortableContext>
             </BoardContainer>
 
@@ -293,12 +298,11 @@ export function KanbanBoard() {
         const isActiveAColumn = activeData?.type === "Column";
         if (!isActiveAColumn) return;
 
-        setColumns((columns) => {
-            const activeColumnIndex = columns.findIndex((col) => col.id === activeId);
-
-            const overColumnIndex = columns.findIndex((col) => col.id === overId);
-
-            return arrayMove(columns, activeColumnIndex, overColumnIndex);
+        setLeftColumn((leftColumn) => {
+            if (leftColumn === ColumnType.Category) {
+                return ColumnType.Command;
+            }
+            return ColumnType.Category;
         });
     }
 
