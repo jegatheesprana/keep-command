@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
-import { GripVertical, Copy, ChevronDown, ChevronUp } from "lucide-react";
+import { GripVertical, Copy, CopyCheck, ChevronDown, ChevronUp } from "lucide-react";
 import { ColumnType, Command, TaskDragData } from "../types";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +15,7 @@ interface TaskCardProps {
 
 export default function CommandCard({ command, isOverlay }: TaskCardProps) {
     const [showMore, setShowMore] = useState(false);
+    const [copied, setCopied] = useState(false);
     const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
         id: command.id,
         data: {
@@ -42,13 +43,23 @@ export default function CommandCard({ command, isOverlay }: TaskCardProps) {
     });
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(command.content);
-        alert("Code copied to clipboard!");
+        navigator.clipboard.writeText(command.command);
+        setCopied(true);
     };
 
     const handleShowMore = () => {
         setShowMore((prev) => !prev);
     };
+
+    useEffect(() => {
+        if (copied) {
+            const timer = setTimeout(() => {
+                setCopied(false);
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [copied]);
 
     return (
         <Card
@@ -82,7 +93,7 @@ export default function CommandCard({ command, isOverlay }: TaskCardProps) {
                                 fontFamily: `"Fira Code", "Source Code Pro", "Courier New", monospace`,
                             }}
                         >
-                            {command.content}
+                            {command.command}
                         </code>
                     </pre>
 
@@ -94,7 +105,7 @@ export default function CommandCard({ command, isOverlay }: TaskCardProps) {
                                 className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
                             >
                                 <span className="sr-only">Move command</span>
-                                <Copy size={20} />
+                                {copied ? <CopyCheck size={20} /> : <Copy size={20} />}
                             </Button>
                         </div>
 
@@ -113,7 +124,7 @@ export default function CommandCard({ command, isOverlay }: TaskCardProps) {
             </CardHeader>
             {showMore && (
                 <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">
-                    This is used for some changes
+                    {command.description}
                 </CardContent>
             )}
         </Card>

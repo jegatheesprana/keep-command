@@ -39,7 +39,7 @@ export default function CommandColumn({ commands, isOverlay }: BoardColumnProps)
     };
 
     const variants = cva(
-        "h-[500px] max-h-[500px] w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+        "h-[500px] max-h-[500px] w-[600px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
         {
             variants: {
                 dragging: {
@@ -72,7 +72,7 @@ export default function CommandColumn({ commands, isOverlay }: BoardColumnProps)
                 <span className="ml-auto"> Command</span>
             </CardHeader>
             <ScrollArea>
-                <CardContent className="flex flex-grow flex-col gap-2 p-2">
+                <CardContent className="flex flex-grow flex-col gap-1 p-2">
                     <SortableContext items={commandIds}>
                         {commands.map((command) => (
                             <CommandCard key={command.id} command={command} />

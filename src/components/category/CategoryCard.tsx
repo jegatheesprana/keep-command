@@ -3,7 +3,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
-import { GripVertical } from "lucide-react";
+import { GripVertical, HelpCircle, MoreVertical } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { ColumnType, type TaskDragData, type Category } from "../types";
 
@@ -57,11 +57,16 @@ export default function CategoryCard({ category, isOverlay }: TaskCardProps) {
                     <span className="sr-only">Move category</span>
                     <GripVertical />
                 </Button>
-                <Badge variant={"outline"} className="ml-auto font-semibold">
-                    Category
-                </Badge>
+                <div className="ml-auto space-between flex flex-row space-x-1">
+                    <Badge variant={"outline"} className="font-semibold">
+                        <HelpCircle size={15} />
+                    </Badge>
+                    <Button variant={"ghost"} className="p-1 text-secondary-foreground/50 -ml-2 h-auto">
+                        <MoreVertical />
+                    </Button>
+                </div>
             </CardHeader>
-            <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">{category.content}</CardContent>
+            <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">{category.title}</CardContent>
         </Card>
     );
 }

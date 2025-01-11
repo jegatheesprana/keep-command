@@ -12,15 +12,17 @@ export interface Column {
 
 export type ColumnItem = {
     id: UniqueIdentifier;
-    content: string;
 };
 
 export type Command = ColumnItem & {
-    content: string;
+    command: string;
+    description: string;
 };
 
 export type Category = ColumnItem & {
-    content: string;
+    title: string;
+    description: string;
+    commands: Command[];
 };
 
 export type ItemType = "ColumnItem";

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import BoardContainer from "./BoardColumn";
@@ -23,7 +23,7 @@ import { hasDraggableData } from "./utils";
 import { coordinateGetter } from "./multipleContainersKeyboardPreset";
 import CategoryCard from "./category/CategoryCard";
 import CommandCard from "./command/CommandCard";
-import { Column, ColumnType, type ColumnItem } from "./types";
+import { type Category, type Column, ColumnType, type Command } from "./types";
 
 const categoryColumn: Column = {
     id: ColumnType.Category,
@@ -35,70 +35,92 @@ const commandColumn: Column = {
     title: "Command",
 };
 
-const initialCategories: ColumnItem[] = [
+const initialCategories: Category[] = [
     {
         id: "item1",
-        content: "Project initiation and planning",
+        title: "Project initiation and planning",
+        description: "Tasks related to project initiation and planning",
+        commands: [
+            {
+                id: "item6",
+                command: "cd ../",
+                description: "Implement user authentication",
+            },
+            {
+                id: "item7",
+                command: "cd ../",
+                description: "Build contact us page",
+            },
+            {
+                id: "item8",
+                command: "cd ../",
+                description: "Create product catalog",
+            },
+        ] satisfies Command[],
     },
     {
         id: "item2",
-        content: "Gather requirements from stakeholders",
+        title: "Gather requirements from stakeholders",
+        description: "Tasks related to project initiation and planning",
+        commands: [
+            {
+                id: "item9",
+                command: "cd ../",
+                description: "Develop about us page",
+            },
+            {
+                id: "item10",
+                command: "cd ../",
+                description: "Optimize website for mobile devices",
+            },
+            {
+                id: "item11",
+                command: "cd ../",
+                description: "Integrate payment gateway",
+            },
+            {
+                id: "item12",
+                command: "cd ../",
+                description: "Perform testing and bug fixing",
+            },
+            {
+                id: "item13",
+                command: "cd ../",
+                description: "Launch website and deploy to server",
+            },
+        ] satisfies Command[],
     },
     {
         id: "item3",
-        content: "Create wireframes and mockups",
+        title: "Create wireframes and mockups",
+        description: "Tasks related to project initiation and planning",
+        commands: [],
     },
     {
         id: "item4",
-        content: "Develop homepage layout",
+        title: "Develop homepage layout",
+        description: "Tasks related to project initiation and planning",
+        commands: [],
     },
     {
         id: "item5",
-        content: "Design color scheme and typography",
+        title: "Design color scheme and typography",
+        description: "Tasks related to project initiation and planning",
+        commands: [],
     },
 ];
 
-const initialCommands: ColumnItem[] = [
-    {
-        id: "item6",
-        content: "Implement user authentication",
-    },
-    {
-        id: "item7",
-        content: "Build contact us page",
-    },
-    {
-        id: "item8",
-        content: "Create product catalog",
-    },
-    {
-        id: "item9",
-        content: "Develop about us page",
-    },
-    {
-        id: "item10",
-        content: "Optimize website for mobile devices",
-    },
-    {
-        id: "item11",
-        content: "Integrate payment gateway",
-    },
-    {
-        id: "item12",
-        content: "Perform testing and bug fixing",
-    },
-    {
-        id: "item13",
-        content: "Launch website and deploy to server",
-    },
-];
+const initialCommands: Command[] = [];
 
 export function KanbanBoard() {
     const [leftColumn, setLeftColumn] = useState<ColumnType>(ColumnType.Category);
     const pickedUpTaskColumn = useRef<ColumnType | null>(null);
 
-    const [categories, setCategories] = useState<ColumnItem[]>(initialCategories);
-    const [commands, setCommands] = useState<ColumnItem[]>(initialCommands);
+    const [categories, setCategories] = useState<Category[]>(initialCategories);
+    const [selectedCategory, setSelectedCategory] = useState<number>(0);
+    const commands = useMemo(() => {
+        return categories[selectedCategory]?.commands || [];
+    }, [categories, selectedCategory]);
 
     const [activeColumn, setActiveColumn] = useState<string | null>(null);
 
@@ -227,14 +249,12 @@ export function KanbanBoard() {
                         {activeItem &&
                             (activeItem.column === ColumnType.Category ? (
                                 <CategoryCard
-                                    category={
-                                        categories.find((category) => category.id === activeItem.id) as ColumnItem
-                                    }
+                                    category={categories.find((category) => category.id === activeItem.id) as Category}
                                     isOverlay
                                 />
                             ) : (
                                 <CommandCard
-                                    command={commands.find((command) => command.id === activeItem.id) as ColumnItem}
+                                    command={commands.find((command) => command.id === activeItem.id) as Command}
                                     isOverlay
                                 />
                             ))}
@@ -319,11 +339,23 @@ export function KanbanBoard() {
                     return arrayMove(categories, activeIndex, overIndex);
                 });
             } else {
-                setCommands((commands) => {
+                setCategories((categories) => {
+                    const commands = categories[selectedCategory].commands || [];
+
                     const activeIndex = commands.findIndex((t) => t.id === activeId);
                     const overIndex = commands.findIndex((t) => t.id === overId);
 
-                    return arrayMove(commands, activeIndex, overIndex);
+                    const moved = arrayMove(commands, activeIndex, overIndex);
+
+                    return categories.map((category, index) => {
+                        if (index === selectedCategory) {
+                            return {
+                                ...category,
+                                commands: moved,
+                            };
+                        }
+                        return category;
+                    });
                 });
             }
         }
