@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
 import { GripVertical } from "lucide-react";
 import { Badge } from "./ui/badge";
-import { ColumnId } from "./KanbanBoard";
+import { ColumnType } from "./KanbanBoard";
 
 export interface Task {
     id: UniqueIdentifier;
-    columnId: ColumnId;
+    columnId: ColumnType;
     content: string;
 }
 

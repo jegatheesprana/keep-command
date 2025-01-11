@@ -1,5 +1,5 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { useDndContext, type UniqueIdentifier } from "@dnd-kit/core";
+import { useDndContext } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { useMemo } from "react";
 import { Task, TaskCard } from "./TaskCard";
@@ -8,16 +8,9 @@ import { Card, CardContent, CardHeader } from "./ui/card";
 import { Button } from "./ui/button";
 import { GripVertical } from "lucide-react";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
-
-export interface Column {
-    id: UniqueIdentifier;
-    title: string;
-}
-
-export type ColumnType = "Column";
-
+import type { Column } from "./KanbanBoard";
 export interface ColumnDragData {
-    type: ColumnType;
+    type: "Column";
     column: Column;
 }
 
