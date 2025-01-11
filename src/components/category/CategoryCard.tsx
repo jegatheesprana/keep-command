@@ -1,4 +1,3 @@
-import type { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -6,23 +5,11 @@ import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
 import { GripVertical } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { ColumnType, type ColumnItem } from "../types";
-
-export type Category = ColumnItem & {
-    content: string;
-};
+import { ColumnType, type TaskDragData, type Category } from "../types";
 
 interface TaskCardProps {
     category: Category;
     isOverlay?: boolean;
-}
-
-export type ItemType = "ColumnItem";
-
-export interface TaskDragData {
-    type: ItemType;
-    columnType: ColumnType;
-    id: UniqueIdentifier;
 }
 
 export default function CategoryCard({ category, isOverlay }: TaskCardProps) {

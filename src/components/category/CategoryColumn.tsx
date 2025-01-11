@@ -1,13 +1,13 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMemo } from "react";
-import CategoryCard, { Category } from "./CategoryCard";
+import CategoryCard from "./CategoryCard";
 import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { GripVertical } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
-import { type ColumnDragData, ColumnType } from "../types";
+import { type Category, type ColumnDragData, ColumnType } from "../types";
 
 interface BoardColumnProps {
     categories: Category[];

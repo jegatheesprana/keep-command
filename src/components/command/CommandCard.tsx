@@ -5,8 +5,13 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
 import { GripVertical, Copy, ChevronDown, ChevronUp } from "lucide-react";
-import { ColumnType, TaskCardProps, TaskDragData } from "../types";
+import { ColumnType, Command, TaskDragData } from "../types";
 import { cn } from "@/lib/utils";
+
+interface TaskCardProps {
+    command: Command;
+    isOverlay?: boolean;
+}
 
 export default function CommandCard({ command, isOverlay }: TaskCardProps) {
     const [showMore, setShowMore] = useState(false);

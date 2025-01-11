@@ -19,10 +19,9 @@ export type Command = ColumnItem & {
     content: string;
 };
 
-export interface TaskCardProps {
-    command: Command;
-    isOverlay?: boolean;
-}
+export type Category = ColumnItem & {
+    content: string;
+};
 
 export type ItemType = "ColumnItem";
 
