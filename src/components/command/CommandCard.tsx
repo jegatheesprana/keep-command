@@ -1,4 +1,3 @@
-import type { UniqueIdentifier } from "@dnd-kit/core";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -6,37 +5,18 @@ import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
 import { GripVertical } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { ColumnType } from "../KanbanBoard";
-
-export interface Task {
-    id: UniqueIdentifier;
-    columnId: ColumnType;
-    content: string;
-}
-
-interface TaskCardProps {
-    command: Task;
-    isOverlay?: boolean;
-}
-
-export type TaskType = "Task";
-
-export interface TaskDragData {
-    type: TaskType;
-    columnType: ColumnType;
-    id: UniqueIdentifier;
-}
+import { ColumnType, TaskCardProps, TaskDragData } from "../types";
 
 export default function CommandCard({ command, isOverlay }: TaskCardProps) {
     const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
         id: command.id,
         data: {
-            type: "Task",
+            type: "ColumnItem",
             columnType: ColumnType.Command,
             id: command.id,
         } satisfies TaskDragData,
         attributes: {
-            roleDescription: "Task",
+            roleDescription: "Command",
         },
     });
 
@@ -73,7 +53,7 @@ export default function CommandCard({ command, isOverlay }: TaskCardProps) {
                     <GripVertical />
                 </Button>
                 <Badge variant={"outline"} className="ml-auto font-semibold">
-                    Task
+                    Command
                 </Badge>
             </CardHeader>
             <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">{command.content}</CardContent>

@@ -6,23 +6,21 @@ import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
 import { GripVertical } from "lucide-react";
 import { Badge } from "../ui/badge";
-import { ColumnType } from "../KanbanBoard";
+import { ColumnType, type ColumnItem } from "../types";
 
-export interface Task {
-    id: UniqueIdentifier;
-    columnId: ColumnType;
+export type Category = ColumnItem & {
     content: string;
-}
+};
 
 interface TaskCardProps {
-    category: Task;
+    category: Category;
     isOverlay?: boolean;
 }
 
-export type TaskType = "Task";
+export type ItemType = "ColumnItem";
 
 export interface TaskDragData {
-    type: TaskType;
+    type: ItemType;
     columnType: ColumnType;
     id: UniqueIdentifier;
 }
@@ -31,12 +29,12 @@ export default function CategoryCard({ category, isOverlay }: TaskCardProps) {
     const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
         id: category.id,
         data: {
-            type: "Task",
+            type: "ColumnItem",
             columnType: ColumnType.Category,
             id: category.id,
         } satisfies TaskDragData,
         attributes: {
-            roleDescription: "Task",
+            roleDescription: "Category",
         },
     });
 
@@ -73,7 +71,7 @@ export default function CategoryCard({ category, isOverlay }: TaskCardProps) {
                     <GripVertical />
                 </Button>
                 <Badge variant={"outline"} className="ml-auto font-semibold">
-                    Task
+                    Category
                 </Badge>
             </CardHeader>
             <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">{category.content}</CardContent>

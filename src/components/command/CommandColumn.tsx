@@ -1,21 +1,16 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useMemo } from "react";
-import CommandCard, { Task } from "./CommandCard";
+import CommandCard from "./CommandCard";
 import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { GripVertical } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
-import { ColumnType, type Column } from "../KanbanBoard";
-
-export interface ColumnDragData {
-    type: "Column";
-    column: Column;
-}
+import { type ColumnDragData, ColumnType, type Command } from "../types";
 
 interface BoardColumnProps {
-    commands: Task[];
+    commands: Command[];
     isOverlay?: boolean;
 }
 

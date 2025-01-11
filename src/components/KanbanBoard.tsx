@@ -19,21 +19,11 @@ import {
     MouseSensor,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
-import { type Task } from "./TaskCard";
 import { hasDraggableData } from "./utils";
 import { coordinateGetter } from "./multipleContainersKeyboardPreset";
 import CategoryCard from "./category/CategoryCard";
 import CommandCard from "./command/CommandCard";
-
-export enum ColumnType {
-    Category = "category",
-    Command = "command",
-}
-
-export interface Column {
-    id: ColumnType;
-    title: string;
-}
+import { Column, ColumnType, type ColumnItem } from "./types";
 
 const categoryColumn: Column = {
     id: ColumnType.Category,
@@ -45,73 +35,60 @@ const commandColumn: Column = {
     title: "Command",
 };
 
-const initialCategories: Task[] = [
+const initialCategories: ColumnItem[] = [
     {
         id: "item1",
-        columnId: ColumnType.Category,
         content: "Project initiation and planning",
     },
     {
         id: "item2",
-        columnId: ColumnType.Category,
         content: "Gather requirements from stakeholders",
     },
     {
         id: "item3",
-        columnId: ColumnType.Category,
         content: "Create wireframes and mockups",
     },
     {
         id: "item4",
-        columnId: ColumnType.Category,
         content: "Develop homepage layout",
     },
     {
         id: "item5",
-        columnId: ColumnType.Category,
         content: "Design color scheme and typography",
     },
 ];
 
-const initialCommands: Task[] = [
+const initialCommands: ColumnItem[] = [
     {
         id: "item6",
-        columnId: ColumnType.Command,
         content: "Implement user authentication",
     },
     {
         id: "item7",
-        columnId: ColumnType.Command,
         content: "Build contact us page",
     },
     {
         id: "item8",
-        columnId: ColumnType.Command,
         content: "Create product catalog",
     },
     {
         id: "item9",
-        columnId: ColumnType.Command,
         content: "Develop about us page",
     },
     {
         id: "item10",
-        columnId: ColumnType.Command,
         content: "Optimize website for mobile devices",
     },
     {
         id: "item11",
-        columnId: ColumnType.Command,
         content: "Integrate payment gateway",
     },
     {
         id: "item12",
-        columnId: ColumnType.Command,
         content: "Perform testing and bug fixing",
     },
     {
         id: "item13",
-        columnId: ColumnType.Command,
         content: "Launch website and deploy to server",
     },
 ];
@@ -120,8 +97,8 @@ export function KanbanBoard() {
     const [leftColumn, setLeftColumn] = useState<ColumnType>(ColumnType.Category);
     const pickedUpTaskColumn = useRef<ColumnType | null>(null);
 
-    const [categories, setCategories] = useState<Task[]>(initialCategories);
-    const [commands, setCommands] = useState<Task[]>(initialCommands);
+    const [categories, setCategories] = useState<ColumnItem[]>(initialCategories);
+    const [commands, setCommands] = useState<ColumnItem[]>(initialCommands);
 
     const [activeColumn, setActiveColumn] = useState<string | null>(null);
 
@@ -152,13 +129,13 @@ export function KanbanBoard() {
             if (active.data.current?.type === "Column") {
                 const startColumn = active.id === ColumnType.Category ? categoryColumn : commandColumn;
                 return `Picked up Column ${startColumn?.title} at position: ${active.id}`;
-            } else if (active.data.current?.type === "Task") {
+            } else if (active.data.current?.type === "ColumnItem") {
                 pickedUpTaskColumn.current = active.data.current.columnType;
                 const { itemsInColumn, itemPosition, column } = getDraggingTaskData(
                     active.id,
                     pickedUpTaskColumn.current || ColumnType.Command
                 );
-                return `Picked up Task ${active.data.current.id} at position: ${itemPosition + 1} of ${
+                return `Picked up ColumnItem ${active.data.current.id} at position: ${itemPosition + 1} of ${
                     itemsInColumn.length
                 } in column ${column?.title}`;
             }
@@ -168,17 +145,17 @@ export function KanbanBoard() {
 
             if (active.data.current?.type === "Column" && over.data.current?.type === "Column") {
                 return `Column ${active.data.current.column.title} was moved over ${over.data.current.column.title} at position ${over.id}`;
-            } else if (active.data.current?.type === "Task" && over.data.current?.type === "Task") {
+            } else if (active.data.current?.type === "ColumnItem" && over.data.current?.type === "ColumnItem") {
                 const { itemsInColumn, itemPosition, column } = getDraggingTaskData(
                     over.id,
                     over.data.current.columnType
                 );
                 if (over.data.current.columnType !== pickedUpTaskColumn.current) {
-                    return `Task ${active.data.current.id} was moved over column ${column?.title} in position ${
+                    return `ColumnItem ${active.data.current.id} was moved over column ${column?.title} in position ${
                         itemPosition + 1
                     } of ${itemsInColumn.length}`;
                 }
-                return `Task was moved over position ${itemPosition + 1} of ${itemsInColumn.length} in column ${
+                return `ColumnItem was moved over position ${itemPosition + 1} of ${itemsInColumn.length} in column ${
                     column?.title
                 }`;
             }
@@ -190,17 +167,17 @@ export function KanbanBoard() {
             }
             if (active.data.current?.type === "Column" && over.data.current?.type === "Column") {
                 return `Column ${active.data.current.column.title} was dropped into position over.id`;
-            } else if (active.data.current?.type === "Task" && over.data.current?.type === "Task") {
+            } else if (active.data.current?.type === "ColumnItem" && over.data.current?.type === "ColumnItem") {
                 const { itemsInColumn, itemPosition, column } = getDraggingTaskData(
                     over.id,
                     over.data.current.columnType
                 );
                 if (over.data.current.columnType !== pickedUpTaskColumn.current) {
-                    return `Task was dropped into column ${column?.title} in position ${itemPosition + 1} of ${
+                    return `ColumnItem was dropped into column ${column?.title} in position ${itemPosition + 1} of ${
                         itemsInColumn.length
                     }`;
                 }
-                return `Task was dropped into position ${itemPosition + 1} of ${itemsInColumn.length} in column ${
+                return `ColumnItem was dropped into position ${itemPosition + 1} of ${itemsInColumn.length} in column ${
                     column?.title
                 }`;
             }
@@ -250,12 +227,14 @@ export function KanbanBoard() {
                         {activeItem &&
                             (activeItem.column === ColumnType.Category ? (
                                 <CategoryCard
-                                    category={categories.find((category) => category.id === activeItem.id) as Task}
+                                    category={
+                                        categories.find((category) => category.id === activeItem.id) as ColumnItem
+                                    }
                                     isOverlay
                                 />
                             ) : (
                                 <CommandCard
-                                    command={commands.find((command) => command.id === activeItem.id) as Task}
+                                    command={commands.find((command) => command.id === activeItem.id) as ColumnItem}
                                     isOverlay
                                 />
                             ))}
@@ -273,10 +252,10 @@ export function KanbanBoard() {
             return;
         }
 
-        if (data?.type === "Task") {
+        if (data?.type === "ColumnItem") {
             setActiveItem({
                 column: data.columnType,
-                id: data.id,
+                id: data.id as string,
             });
             return;
         }
@@ -323,14 +302,14 @@ export function KanbanBoard() {
         const activeData = active.data.current;
         const overData = over.data.current;
 
-        const isActiveATask = activeData?.type === "Task";
-        const isOverATask = overData?.type === "Task";
+        const isActiveATask = activeData?.type === "ColumnItem";
+        const isOverATask = overData?.type === "ColumnItem";
 
         if (!isActiveATask) return;
 
         if (activeData?.columnType !== overData?.columnType) return;
 
-        // Im dropping a Task over another Task
+        // Im dropping a ColumnItem over another ColumnItem
         if (isActiveATask && isOverATask) {
             if (activeData?.columnType === ColumnType.Category) {
                 setCategories((categories) => {
