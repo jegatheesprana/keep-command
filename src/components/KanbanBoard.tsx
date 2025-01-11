@@ -1,7 +1,9 @@
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { BoardColumn, BoardContainer } from "./BoardColumn";
+import BoardContainer from "./BoardColumn";
+import CategoryColumn from "./category/CategoryColumn";
+import CommandColumn from "./command/CommandColumn";
 import {
     DndContext,
     type DragEndEvent,
@@ -17,9 +19,11 @@ import {
     MouseSensor,
 } from "@dnd-kit/core";
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
-import { type Task, TaskCard } from "./TaskCard";
+import { type Task } from "./TaskCard";
 import { hasDraggableData } from "./utils";
 import { coordinateGetter } from "./multipleContainersKeyboardPreset";
+import CategoryCard from "./category/CategoryCard";
+import CommandCard from "./command/CommandCard";
 
 export enum ColumnType {
     Category = "category",
@@ -41,82 +45,87 @@ const commandColumn: Column = {
     title: "Command",
 };
 
-const initialTasks: Task[] = [
+const initialCategories: Task[] = [
     {
-        id: "task1",
+        id: "item1",
         columnId: ColumnType.Category,
         content: "Project initiation and planning",
     },
     {
-        id: "task2",
+        id: "item2",
         columnId: ColumnType.Category,
         content: "Gather requirements from stakeholders",
     },
     {
-        id: "task3",
+        id: "item3",
         columnId: ColumnType.Category,
         content: "Create wireframes and mockups",
     },
     {
-        id: "task4",
+        id: "item4",
         columnId: ColumnType.Category,
         content: "Develop homepage layout",
     },
     {
-        id: "task5",
+        id: "item5",
         columnId: ColumnType.Category,
         content: "Design color scheme and typography",
     },
+];
+
+const initialCommands: Task[] = [
     {
-        id: "task6",
+        id: "item6",
         columnId: ColumnType.Command,
         content: "Implement user authentication",
     },
     {
-        id: "task7",
+        id: "item7",
         columnId: ColumnType.Command,
         content: "Build contact us page",
     },
     {
-        id: "task8",
+        id: "item8",
         columnId: ColumnType.Command,
         content: "Create product catalog",
     },
     {
-        id: "task9",
+        id: "item9",
         columnId: ColumnType.Command,
         content: "Develop about us page",
     },
     {
-        id: "task10",
+        id: "item10",
         columnId: ColumnType.Command,
         content: "Optimize website for mobile devices",
     },
     {
-        id: "task11",
+        id: "item11",
         columnId: ColumnType.Command,
         content: "Integrate payment gateway",
     },
     {
-        id: "task12",
+        id: "item12",
         columnId: ColumnType.Command,
         content: "Perform testing and bug fixing",
     },
     {
-        id: "task13",
+        id: "item13",
         columnId: ColumnType.Command,
         content: "Launch website and deploy to server",
     },
 ];
+
 export function KanbanBoard() {
     const [leftColumn, setLeftColumn] = useState<ColumnType>(ColumnType.Category);
     const pickedUpTaskColumn = useRef<ColumnType | null>(null);
 
-    const [tasks, setTasks] = useState<Task[]>(initialTasks);
+    const [categories, setCategories] = useState<Task[]>(initialCategories);
+    const [commands, setCommands] = useState<Task[]>(initialCommands);
 
     const [activeColumn, setActiveColumn] = useState<string | null>(null);
 
-    const [activeTask, setActiveTask] = useState<Task | null>(null);
+    const [activeItem, setActiveItem] = useState<{ column: ColumnType; id: string } | null>(null);
 
     const sensors = useSensors(
         useSensor(MouseSensor),
@@ -126,13 +135,13 @@ export function KanbanBoard() {
         })
     );
 
-    function getDraggingTaskData(taskId: UniqueIdentifier, columnId: ColumnType) {
-        const tasksInColumn = tasks.filter((task) => task.columnId === columnId);
-        const taskPosition = tasksInColumn.findIndex((task) => task.id === taskId);
-        const column = columnId === ColumnType.Category ? categoryColumn : commandColumn;
+    function getDraggingTaskData(itemId: UniqueIdentifier, columnType: ColumnType) {
+        const itemsInColumn = columnType === ColumnType.Category ? categories : commands;
+        const itemPosition = itemsInColumn.findIndex((item) => item.id === itemId);
+        const column = columnType === ColumnType.Category ? categoryColumn : commandColumn;
         return {
-            tasksInColumn,
-            taskPosition,
+            itemsInColumn,
+            itemPosition,
             column,
         };
     }
@@ -144,13 +153,13 @@ export function KanbanBoard() {
                 const startColumn = active.id === ColumnType.Category ? categoryColumn : commandColumn;
                 return `Picked up Column ${startColumn?.title} at position: ${active.id}`;
             } else if (active.data.current?.type === "Task") {
-                pickedUpTaskColumn.current = active.data.current.task.columnId;
-                const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
+                pickedUpTaskColumn.current = active.data.current.columnType;
+                const { itemsInColumn, itemPosition, column } = getDraggingTaskData(
                     active.id,
-                    pickedUpTaskColumn.current
+                    pickedUpTaskColumn.current || ColumnType.Command
                 );
-                return `Picked up Task ${active.data.current.task.content} at position: ${taskPosition + 1} of ${
-                    tasksInColumn.length
+                return `Picked up Task ${active.data.current.id} at position: ${itemPosition + 1} of ${
+                    itemsInColumn.length
                 } in column ${column?.title}`;
             }
         },
@@ -160,16 +169,16 @@ export function KanbanBoard() {
             if (active.data.current?.type === "Column" && over.data.current?.type === "Column") {
                 return `Column ${active.data.current.column.title} was moved over ${over.data.current.column.title} at position ${over.id}`;
             } else if (active.data.current?.type === "Task" && over.data.current?.type === "Task") {
-                const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
+                const { itemsInColumn, itemPosition, column } = getDraggingTaskData(
                     over.id,
-                    over.data.current.task.columnId
+                    over.data.current.columnType
                 );
-                if (over.data.current.task.columnId !== pickedUpTaskColumn.current) {
-                    return `Task ${active.data.current.task.content} was moved over column ${
-                        column?.title
-                    } in position ${taskPosition + 1} of ${tasksInColumn.length}`;
+                if (over.data.current.columnType !== pickedUpTaskColumn.current) {
+                    return `Task ${active.data.current.id} was moved over column ${column?.title} in position ${
+                        itemPosition + 1
+                    } of ${itemsInColumn.length}`;
                 }
-                return `Task was moved over position ${taskPosition + 1} of ${tasksInColumn.length} in column ${
+                return `Task was moved over position ${itemPosition + 1} of ${itemsInColumn.length} in column ${
                     column?.title
                 }`;
             }
@@ -182,16 +191,16 @@ export function KanbanBoard() {
             if (active.data.current?.type === "Column" && over.data.current?.type === "Column") {
                 return `Column ${active.data.current.column.title} was dropped into position over.id`;
             } else if (active.data.current?.type === "Task" && over.data.current?.type === "Task") {
-                const { tasksInColumn, taskPosition, column } = getDraggingTaskData(
+                const { itemsInColumn, itemPosition, column } = getDraggingTaskData(
                     over.id,
-                    over.data.current.task.columnId
+                    over.data.current.columnType
                 );
-                if (over.data.current.task.columnId !== pickedUpTaskColumn.current) {
-                    return `Task was dropped into column ${column?.title} in position ${taskPosition + 1} of ${
-                        tasksInColumn.length
+                if (over.data.current.columnType !== pickedUpTaskColumn.current) {
+                    return `Task was dropped into column ${column?.title} in position ${itemPosition + 1} of ${
+                        itemsInColumn.length
                     }`;
                 }
-                return `Task was dropped into position ${taskPosition + 1} of ${tasksInColumn.length} in column ${
+                return `Task was dropped into position ${itemPosition + 1} of ${itemsInColumn.length} in column ${
                     column?.title
                 }`;
             }
@@ -218,25 +227,13 @@ export function KanbanBoard() {
                 <SortableContext items={[ColumnType.Category, ColumnType.Command]}>
                     {leftColumn === ColumnType.Category ? (
                         <>
-                            <BoardColumn
-                                column={categoryColumn}
-                                tasks={tasks.filter((task) => task.columnId === ColumnType.Category)}
-                            />
-                            <BoardColumn
-                                column={commandColumn}
-                                tasks={tasks.filter((task) => task.columnId === ColumnType.Command)}
-                            />
+                            <CategoryColumn categories={categories} />
+                            <CommandColumn commands={commands} />
                         </>
                     ) : (
                         <>
-                            <BoardColumn
-                                column={commandColumn}
-                                tasks={tasks.filter((task) => task.columnId === ColumnType.Command)}
-                            />
-                            <BoardColumn
-                                column={categoryColumn}
-                                tasks={tasks.filter((task) => task.columnId === ColumnType.Category)}
-                            />
+                            <CommandColumn commands={commands} />
+                            <CategoryColumn categories={categories} />
                         </>
                     )}
                 </SortableContext>
@@ -246,19 +243,22 @@ export function KanbanBoard() {
                 createPortal(
                     <DragOverlay>
                         {activeColumn === ColumnType.Category ? (
-                            <BoardColumn
-                                isOverlay
-                                column={categoryColumn}
-                                tasks={tasks.filter((task) => task.columnId === activeColumn)}
-                            />
+                            <CategoryColumn isOverlay categories={categories} />
                         ) : activeColumn === ColumnType.Command ? (
-                            <BoardColumn
-                                isOverlay
-                                column={commandColumn}
-                                tasks={tasks.filter((task) => task.columnId === activeColumn)}
-                            />
+                            <CommandColumn isOverlay commands={commands} />
                         ) : null}
-                        {activeTask && <TaskCard task={activeTask} isOverlay />}
+                        {activeItem &&
+                            (activeItem.column === ColumnType.Category ? (
+                                <CategoryCard
+                                    category={categories.find((category) => category.id === activeItem.id) as Task}
+                                    isOverlay
+                                />
+                            ) : (
+                                <CommandCard
+                                    command={commands.find((command) => command.id === activeItem.id) as Task}
+                                    isOverlay
+                                />
+                            ))}
                     </DragOverlay>,
                     document.body
                 )}
@@ -274,14 +274,17 @@ export function KanbanBoard() {
         }
 
         if (data?.type === "Task") {
-            setActiveTask(data.task);
+            setActiveItem({
+                column: data.columnType,
+                id: data.id,
+            });
             return;
         }
     }
 
     function onDragEnd(event: DragEndEvent) {
         setActiveColumn(null);
-        setActiveTask(null);
+        setActiveItem(null);
 
         const { active, over } = event;
         if (!over) return;
@@ -325,37 +328,25 @@ export function KanbanBoard() {
 
         if (!isActiveATask) return;
 
-        if (activeData?.task.columnId !== overData?.task?.columnId) return;
+        if (activeData?.columnType !== overData?.columnType) return;
 
         // Im dropping a Task over another Task
         if (isActiveATask && isOverATask) {
-            setTasks((tasks) => {
-                const activeIndex = tasks.findIndex((t) => t.id === activeId);
-                const overIndex = tasks.findIndex((t) => t.id === overId);
-                const activeTask = tasks[activeIndex];
-                const overTask = tasks[overIndex];
-                if (activeTask && overTask && activeTask.columnId !== overTask.columnId) {
-                    activeTask.columnId = overTask.columnId;
-                    return arrayMove(tasks, activeIndex, overIndex - 1);
-                }
+            if (activeData?.columnType === ColumnType.Category) {
+                setCategories((categories) => {
+                    const activeIndex = categories.findIndex((t) => t.id === activeId);
+                    const overIndex = categories.findIndex((t) => t.id === overId);
 
-                return arrayMove(tasks, activeIndex, overIndex);
-            });
-        }
+                    return arrayMove(categories, activeIndex, overIndex);
+                });
+            } else {
+                setCommands((commands) => {
+                    const activeIndex = commands.findIndex((t) => t.id === activeId);
+                    const overIndex = commands.findIndex((t) => t.id === overId);
 
-        const isOverAColumn = overData?.type === "Column";
-
-        // Im dropping a Task over a column
-        if (isActiveATask && isOverAColumn) {
-            setTasks((tasks) => {
-                const activeIndex = tasks.findIndex((t) => t.id === activeId);
-                const activeTask = tasks[activeIndex];
-                if (activeTask) {
-                    activeTask.columnId = overId as ColumnType;
-                    return arrayMove(tasks, activeIndex, activeIndex);
-                }
-                return tasks;
-            });
+                    return arrayMove(commands, activeIndex, overIndex);
+                });
+            }
         }
     }
 }
