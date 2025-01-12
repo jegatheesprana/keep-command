@@ -26,12 +26,12 @@ export default function DeleteAlert({ open, onOpenChange, title, description, on
                 <div className="flex gap-1 mt-4 justify-end">
                     <AlertDialogCancel asChild>
                         <div>
-                            <Button color="gray">Cancel</Button>
+                            <Button variant="secondary">Cancel</Button>
                         </div>
                     </AlertDialogCancel>
                     <AlertDialogAction onClick={onDelete} asChild>
                         <div>
-                            <Button color="red">Delete</Button>
+                            <Button variant="destructive">Delete</Button>
                         </div>
                     </AlertDialogAction>
                 </div>

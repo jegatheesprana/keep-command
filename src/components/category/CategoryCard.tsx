@@ -96,8 +96,7 @@ export default function CategoryCard({ category, isOverlay, onEditClick, onDelet
                 open={deleteAlert}
                 onOpenChange={setDeleteAlert}
                 title="Delete Category"
-                description="Are you sure? This application will no longer be accessible and any existing sessions will be
-                    expired."
+                description="Are you sure? This category will be deleted permanently."
                 onDelete={handleDeleteSuccess}
             />
         </>

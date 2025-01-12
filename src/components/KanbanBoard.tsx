@@ -238,7 +238,7 @@ export default function KanbanBoard() {
         setCategories((categories) => categories.filter((_category) => _category.id !== category.id));
     }
 
-    function modifyCommand(categoryId: UniqueIdentifier, id: UniqueIdentifier, command: Command): void {
+    function modifyCommand(id: UniqueIdentifier, command: Command): void {
         setCategories((categories) => {
             const categoryIndex = categories.findIndex((category) => category.id === categoryId);
             if (categoryIndex === -1) return categories;
@@ -256,6 +256,25 @@ export default function KanbanBoard() {
             const updatedCommands = [
                 ...category.commands.slice(0, commandIndex),
                 command,
+                ...category.commands.slice(commandIndex + 1),
+            ];
+            const updatedCategory = {
+                ...category,
+                commands: updatedCommands,
+            };
+            return [...categories.slice(0, categoryIndex), updatedCategory, ...categories.slice(categoryIndex + 1)];
+        });
+    }
+
+    function removeCommand(command: Command): void {
+        setCategories((categories) => {
+            const categoryIndex = categories.findIndex((category) => category.id === categoryId);
+            if (categoryIndex === -1) return categories;
+            const category = categories[categoryIndex];
+            const commandIndex = category.commands.findIndex((_command) => _command.id === command.id);
+            if (commandIndex === -1) return categories;
+            const updatedCommands = [
+                ...category.commands.slice(0, commandIndex),
                 ...category.commands.slice(commandIndex + 1),
             ];
             const updatedCategory = {
@@ -285,11 +304,19 @@ export default function KanbanBoard() {
                                 modifyCategory={modifyCategory}
                                 onDeleteClick={removeCategory}
                             />
-                            <CommandColumn commands={commands} />
+                            <CommandColumn
+                                commands={commands}
+                                onModifyCommand={modifyCommand}
+                                onDeleteClick={removeCommand}
+                            />
                         </>
                     ) : (
                         <>
-                            <CommandColumn commands={commands} />
+                            <CommandColumn
+                                commands={commands}
+                                onModifyCommand={modifyCommand}
+                                onDeleteClick={removeCommand}
+                            />
                             <CategoryColumn
                                 categories={categories}
                                 modifyCategory={modifyCategory}
@@ -311,7 +338,7 @@ export default function KanbanBoard() {
                                 onDeleteClick={removeCategory}
                             />
                         ) : activeColumn === ColumnType.Command ? (
-                            <CommandColumn isOverlay commands={commands} />
+                            <CommandColumn isOverlay commands={commands} onModifyCommand={modifyCommand} />
                         ) : null}
                         {activeItem &&
                             (activeItem.column === ColumnType.Category ? (
@@ -323,6 +350,7 @@ export default function KanbanBoard() {
                                 <CommandCard
                                     command={commands.find((command) => command.id === activeItem.id) as Command}
                                     isOverlay
+                                    onModifyCommand={modifyCommand}
                                 />
                             ))}
                     </DragOverlay>,

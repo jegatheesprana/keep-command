@@ -1,20 +1,24 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import CommandCard from "./CommandCard";
 import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
-import { GripVertical } from "lucide-react";
+import { GripVertical, Plus } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { type ColumnDragData, ColumnType, type Command } from "../types";
+import { UniqueIdentifier } from "@dnd-kit/core";
 
 interface BoardColumnProps {
     commands: Command[];
     isOverlay?: boolean;
+    onModifyCommand: (id: UniqueIdentifier, command: Command) => void;
+    onDeleteClick?: (command: Command) => void;
 }
 
-export default function CommandColumn({ commands, isOverlay }: BoardColumnProps) {
+export default function CommandColumn({ commands, isOverlay, onModifyCommand, onDeleteClick }: BoardColumnProps) {
+    const [addingCommand, setAddingCommand] = useState(false);
     const commandIds = useMemo(() => {
         return commands.map((command) => command.id);
     }, [commands]);
@@ -51,35 +55,70 @@ export default function CommandColumn({ commands, isOverlay }: BoardColumnProps)
         }
     );
 
+    const handleAddCommand = () => {
+        setAddingCommand(true);
+    };
+
+    const handleEditCommand = (id: UniqueIdentifier, command: Command) => {
+        onModifyCommand(id, command);
+        setAddingCommand(false);
+    };
+
+    const onCancleEdit = () => {
+        setAddingCommand(false);
+    };
+
     return (
-        <Card
-            ref={setNodeRef}
-            style={style}
-            className={variants({
-                dragging: isOverlay ? "overlay" : isDragging ? "over" : undefined,
-            })}
-        >
-            <CardHeader className="p-4 font-semibold border-b-2 text-left flex flex-row space-between items-center">
-                <Button
-                    variant={"ghost"}
-                    {...attributes}
-                    {...listeners}
-                    className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
-                >
-                    <span className="sr-only">{`Move column: Command`}</span>
-                    <GripVertical />
-                </Button>
-                <span className="ml-auto"> Command</span>
-            </CardHeader>
-            <ScrollArea>
-                <CardContent className="flex flex-grow flex-col gap-1 p-2">
-                    <SortableContext items={commandIds}>
-                        {commands.map((command) => (
-                            <CommandCard key={command.id} command={command} />
-                        ))}
-                    </SortableContext>
-                </CardContent>
-            </ScrollArea>
-        </Card>
+        <>
+            <Card
+                ref={setNodeRef}
+                style={style}
+                className={variants({
+                    dragging: isOverlay ? "overlay" : isDragging ? "over" : undefined,
+                })}
+            >
+                <CardHeader className="p-4 font-semibold border-b-2 text-left flex flex-row space-between items-center">
+                    <Button
+                        variant={"ghost"}
+                        {...attributes}
+                        {...listeners}
+                        className=" p-1 text-primary/50 -ml-2 h-auto cursor-grab relative"
+                    >
+                        <span className="sr-only">{`Move column: Command`}</span>
+                        <GripVertical />
+                    </Button>
+                    <Button
+                        variant={"ghost"}
+                        className="ml-auto bg-secondary p-1 text-primary/50 h-auto relative"
+                        onClick={handleAddCommand}
+                    >
+                        <span className="sr-only">{`Add New Command`}</span>
+                        <Plus />
+                    </Button>
+                </CardHeader>
+                <ScrollArea>
+                    <CardContent className="flex flex-grow flex-col gap-1 p-2">
+                        <SortableContext items={commandIds}>
+                            {commands.map((command) => (
+                                <CommandCard
+                                    key={command.id}
+                                    command={command}
+                                    onModifyCommand={handleEditCommand}
+                                    onDeleteClick={onDeleteClick}
+                                />
+                            ))}
+                            {addingCommand && (
+                                <CommandCard
+                                    command={{ id: "", command: "", description: "" }}
+                                    editMode
+                                    onCancleEdit={onCancleEdit}
+                                    onModifyCommand={handleEditCommand}
+                                />
+                            )}
+                        </SortableContext>
+                    </CardContent>
+                </ScrollArea>
+            </Card>
+        </>
     );
 }
