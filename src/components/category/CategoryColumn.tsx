@@ -10,6 +10,7 @@ import { ScrollArea } from "../ui/scroll-area";
 import { type Category, type ColumnDragData, ColumnType } from "../types";
 import AddCategory from "./AddCategory";
 import { UniqueIdentifier } from "@dnd-kit/core";
+import { useSearchParams } from "react-router-dom";
 
 interface CategoryColumnProps {
     categories: Category[];
@@ -26,7 +27,8 @@ const emptyCategory: Category = {
 };
 
 export default function CategoryColumn({ categories, isOverlay, modifyCategory, onDeleteClick }: CategoryColumnProps) {
-    const [modalOpen, setModalOpen] = useState(false);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const modalOpen = searchParams.get("new") === "1";
     const [modalData, setModalData] = useState<Category>(emptyCategory);
     const categoryIds = useMemo(() => {
         return categories.map((category) => category.id);
@@ -49,6 +51,10 @@ export default function CategoryColumn({ categories, isOverlay, modifyCategory, 
     const style = {
         transition,
         transform: CSS.Translate.toString(transform),
+    };
+
+    const setModalOpen = (value: boolean) => {
+        setSearchParams({ new: value ? "1" : "0" });
     };
 
     const variants = cva("h-full w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center", {

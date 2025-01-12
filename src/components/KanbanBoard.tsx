@@ -38,7 +38,8 @@ const commandColumn: Column = {
     title: "Command",
 };
 
-const initialCategories: Category[] = [];
+const DATA_VERSION = "1";
+const DATA_KEY = `data-v${DATA_VERSION}`;
 
 export default function KanbanBoard() {
     const [leftColumn, setLeftColumn] = useState<ColumnType>(ColumnType.Category);
@@ -47,11 +48,11 @@ export default function KanbanBoard() {
     const navigate = useNavigate();
     const { categoryId } = useParams();
 
-    const [categories, setCategories] = useState<Category[]>(initialCategories);
-    const commands = useMemo(() => {
-        const selectedCategory = categories.find((category) => category.id === categoryId);
-        return selectedCategory?.commands || [];
-    }, [categories, categoryId]);
+    const [categories, setCategories] = useState<Category[]>(JSON.parse(localStorage.getItem(DATA_KEY) || "[]"));
+    const selectedCategory = useMemo(
+        () => categories.find((category) => category.id === categoryId) ?? null,
+        [categories, categoryId]
+    );
 
     const [activeColumn, setActiveColumn] = useState<string | null>(null);
 
@@ -64,6 +65,10 @@ export default function KanbanBoard() {
             coordinateGetter: coordinateGetter,
         })
     );
+
+    useEffect(() => {
+        localStorage.setItem(DATA_KEY, JSON.stringify(categories));
+    }, [categories]);
 
     useEffect(() => {
         if (!categoryId && categories.length) {
@@ -79,7 +84,8 @@ export default function KanbanBoard() {
     }, [categoryId, categories]);
 
     function getDraggingTaskData(itemId: UniqueIdentifier, columnType: ColumnType) {
-        const itemsInColumn = columnType === ColumnType.Category ? categories : commands;
+        const itemsInColumn =
+            columnType === ColumnType.Category ? categories : selectedCategory ? selectedCategory.commands : [];
         const itemPosition = itemsInColumn.findIndex((item) => item.id === itemId);
         const column = columnType === ColumnType.Category ? categoryColumn : commandColumn;
         return {
@@ -239,7 +245,7 @@ export default function KanbanBoard() {
                                 onDeleteClick={removeCategory}
                             />
                             <CommandColumn
-                                commands={commands}
+                                category={selectedCategory}
                                 onModifyCommand={modifyCommand}
                                 onDeleteClick={removeCommand}
                             />
@@ -247,7 +253,7 @@ export default function KanbanBoard() {
                     ) : (
                         <>
                             <CommandColumn
-                                commands={commands}
+                                category={selectedCategory}
                                 onModifyCommand={modifyCommand}
                                 onDeleteClick={removeCommand}
                             />
@@ -272,7 +278,7 @@ export default function KanbanBoard() {
                                 onDeleteClick={removeCategory}
                             />
                         ) : activeColumn === ColumnType.Command ? (
-                            <CommandColumn isOverlay commands={commands} onModifyCommand={modifyCommand} />
+                            <CommandColumn isOverlay category={selectedCategory} onModifyCommand={modifyCommand} />
                         ) : null}
                         {activeItem &&
                             (activeItem.column === ColumnType.Category ? (
@@ -282,7 +288,12 @@ export default function KanbanBoard() {
                                 />
                             ) : (
                                 <CommandCard
-                                    command={commands.find((command) => command.id === activeItem.id) as Command}
+                                    command={
+                                        (selectedCategory &&
+                                            selectedCategory.commands.find(
+                                                (command) => command.id === activeItem.id
+                                            )) as Command
+                                    }
                                     isOverlay
                                     onModifyCommand={modifyCommand}
                                 />

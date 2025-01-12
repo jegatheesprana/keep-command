@@ -7,22 +7,24 @@ import { Card, CardContent, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { GripVertical, Plus } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
-import { type ColumnDragData, ColumnType, type Command } from "../types";
+import { Category, type ColumnDragData, ColumnType, type Command } from "../types";
 import { UniqueIdentifier } from "@dnd-kit/core";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import Alert from "./Alert";
 
 interface BoardColumnProps {
-    commands: Command[];
+    category: Category | null;
     isOverlay?: boolean;
     onModifyCommand: (id: UniqueIdentifier, command: Command) => void;
     onDeleteClick?: (command: Command) => void;
 }
 
-export default function CommandColumn({ commands, isOverlay, onModifyCommand, onDeleteClick }: BoardColumnProps) {
+export default function CommandColumn({ category, isOverlay, onModifyCommand, onDeleteClick }: BoardColumnProps) {
     const [addingCommand, setAddingCommand] = useState(false);
     const commandIds = useMemo(() => {
-        return commands.map((command) => command.id);
-    }, [commands]);
+        if (!category) return [];
+        return category.commands.map((command) => command.id);
+    }, [category]);
 
     const { categoryId } = useParams();
 
@@ -87,6 +89,7 @@ export default function CommandColumn({ commands, isOverlay, onModifyCommand, on
                         <span className="sr-only">{`Move column: Command`}</span>
                         <GripVertical />
                     </Button>
+                    <span className="ml-auto"> {category && category.title}</span>
                     {categoryId && (
                         <Button
                             variant={"ghost"}
@@ -98,17 +101,18 @@ export default function CommandColumn({ commands, isOverlay, onModifyCommand, on
                         </Button>
                     )}
                 </CardHeader>
-                <ScrollArea>
-                    <CardContent className="flex flex-grow flex-col gap-1 p-2">
+                <ScrollArea className="h-full">
+                    <CardContent className="h-full flex flex-grow flex-col gap-1 p-2">
                         <SortableContext items={commandIds}>
-                            {commands.map((command) => (
-                                <CommandCard
-                                    key={command.id}
-                                    command={command}
-                                    onModifyCommand={handleEditCommand}
-                                    onDeleteClick={onDeleteClick}
-                                />
-                            ))}
+                            {category &&
+                                category.commands.map((command) => (
+                                    <CommandCard
+                                        key={command.id}
+                                        command={command}
+                                        onModifyCommand={handleEditCommand}
+                                        onDeleteClick={onDeleteClick}
+                                    />
+                                ))}
                             {addingCommand && (
                                 <CommandCard
                                     command={{ id: "", command: "", description: "" }}
@@ -116,6 +120,26 @@ export default function CommandColumn({ commands, isOverlay, onModifyCommand, on
                                     onCancleEdit={onCancleEdit}
                                     onModifyCommand={handleEditCommand}
                                 />
+                            )}
+                            {!category && (
+                                <Alert
+                                    title="No category has been added!"
+                                    message="Create a new category and start saving commands."
+                                >
+                                    <Button variant="outline">
+                                        <Link to="?new=1">Add New Category</Link>
+                                    </Button>
+                                </Alert>
+                            )}
+                            {category && !category.commands.length && !addingCommand && (
+                                <Alert
+                                    title="No commands have been added!"
+                                    message="Add a new command by clicking on the plus icon."
+                                >
+                                    <Button variant="outline" onClick={handleAddCommand}>
+                                        Add New Command
+                                    </Button>
+                                </Alert>
                             )}
                         </SortableContext>
                     </CardContent>

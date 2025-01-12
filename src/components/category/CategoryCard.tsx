@@ -87,8 +87,10 @@ export default function CategoryCard({ category, isOverlay, onEditClick, onDelet
                         )}
                     </div>
                 </CardHeader>
-                <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">
-                    <Link to={`/${category.id}`}>{category.title}</Link>
+                <CardContent className="p-0">
+                    <Link className="block px-3 pt-3 pb-6 text-left whitespace-pre-wrap" to={`/${category.id}`}>
+                        {category.title || " "}
+                    </Link>
                 </CardContent>
             </Card>
             <DeleteAlert
