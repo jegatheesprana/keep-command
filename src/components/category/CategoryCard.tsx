@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import Action from "./Action";
 import DeleteAlert from "../DeleteAlert";
 import { useState } from "react";
+import InfoCard from "./InfoCard";
 
 interface CategoryCardProps {
     category: Category;
@@ -75,9 +76,13 @@ export default function CategoryCard({ category, isOverlay, onEditClick, onDelet
                         <GripVertical />
                     </Button>
                     <div className="ml-auto space-between flex flex-row space-x-1">
-                        <Badge variant={"outline"} className="font-semibold">
-                            <HelpCircle size={15} />
-                        </Badge>
+                        {category.description && (
+                            <InfoCard content={category.description}>
+                                <div className="flex flex-row items-center space-x-1">
+                                    <HelpCircle size={15} />
+                                </div>
+                            </InfoCard>
+                        )}
                         {onEditClick && onDeleteClick && (
                             <Action onEditClick={() => onEditClick(category)} onDeleteClick={handleDeleteClick} />
                         )}
