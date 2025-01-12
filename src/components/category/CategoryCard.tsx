@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cva } from "class-variance-authority";
 import { GripVertical, HelpCircle } from "lucide-react";
-import { Badge } from "../ui/badge";
 import { ColumnType, type TaskDragData, type Category } from "../types";
 import { Link } from "react-router-dom";
 import Action from "./Action";

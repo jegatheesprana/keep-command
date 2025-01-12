@@ -38,80 +38,7 @@ const commandColumn: Column = {
     title: "Command",
 };
 
-const initialCategories: Category[] = [
-    {
-        id: "item1",
-        title: "Project initiation and planning",
-        description: "Tasks related to project initiation and planning",
-        commands: [
-            {
-                id: "item6",
-                command: "cd ../",
-                description: "Implement user authentication",
-            },
-            {
-                id: "item7",
-                command: "cd ../",
-                description: "Build contact us page",
-            },
-            {
-                id: "item8",
-                command: "cd ../",
-                description: "Create product catalog",
-            },
-        ] satisfies Command[],
-    },
-    {
-        id: "item2",
-        title: "Gather requirements from stakeholders",
-        description: "Tasks related to project initiation and planning",
-        commands: [
-            {
-                id: "item9",
-                command: "cd ../",
-                description: "Develop about us page",
-            },
-            {
-                id: "item10",
-                command: "cd ../",
-                description: "Optimize website for mobile devices",
-            },
-            {
-                id: "item11",
-                command: "cd ../",
-                description: "Integrate payment gateway",
-            },
-            {
-                id: "item12",
-                command: "cd ../",
-                description: "Perform testing and bug fixing",
-            },
-            {
-                id: "item13",
-                command: "cd ../",
-                description: "Launch website and deploy to server",
-            },
-        ] satisfies Command[],
-    },
-    {
-        id: "item3",
-        title: "Create wireframes and mockups",
-        description: "Tasks related to project initiation and planning",
-        commands: [],
-    },
-    {
-        id: "item4",
-        title: "Develop homepage layout",
-        description: "Tasks related to project initiation and planning",
-        commands: [],
-    },
-    {
-        id: "item5",
-        title: "Design color scheme and typography",
-        description: "Tasks related to project initiation and planning",
-        commands: [],
-    },
-];
+const initialCategories: Category[] = [];
 
 export default function KanbanBoard() {
     const [leftColumn, setLeftColumn] = useState<ColumnType>(ColumnType.Category);
@@ -139,7 +66,7 @@ export default function KanbanBoard() {
     );
 
     useEffect(() => {
-        if (!categoryId) {
+        if (!categoryId && categories.length) {
             navigate(`/${categories[0].id}`);
         }
     }, []);
@@ -235,6 +162,9 @@ export default function KanbanBoard() {
     }
 
     function removeCategory(category: Category): void {
+        if (category.id === categoryId) {
+            navigate("/");
+        }
         setCategories((categories) => categories.filter((_category) => _category.id !== category.id));
     }
 

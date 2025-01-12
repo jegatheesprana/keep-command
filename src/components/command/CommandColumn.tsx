@@ -9,6 +9,7 @@ import { GripVertical, Plus } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { type ColumnDragData, ColumnType, type Command } from "../types";
 import { UniqueIdentifier } from "@dnd-kit/core";
+import { useParams } from "react-router-dom";
 
 interface BoardColumnProps {
     commands: Command[];
@@ -22,6 +23,8 @@ export default function CommandColumn({ commands, isOverlay, onModifyCommand, on
     const commandIds = useMemo(() => {
         return commands.map((command) => command.id);
     }, [commands]);
+
+    const { categoryId } = useParams();
 
     const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
         id: ColumnType.Command,
@@ -43,7 +46,7 @@ export default function CommandColumn({ commands, isOverlay, onModifyCommand, on
     };
 
     const variants = cva(
-        "h-[500px] max-h-[500px] w-[600px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+        "h-[500px] max-h-[500px] flex-1 max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
         {
             variants: {
                 dragging: {
@@ -87,14 +90,16 @@ export default function CommandColumn({ commands, isOverlay, onModifyCommand, on
                         <span className="sr-only">{`Move column: Command`}</span>
                         <GripVertical />
                     </Button>
-                    <Button
-                        variant={"ghost"}
-                        className="ml-auto bg-secondary p-1 text-primary/50 h-auto relative"
-                        onClick={handleAddCommand}
-                    >
-                        <span className="sr-only">{`Add New Command`}</span>
-                        <Plus />
-                    </Button>
+                    {categoryId && (
+                        <Button
+                            variant={"ghost"}
+                            className="ml-auto bg-secondary p-1 text-primary/50 h-auto relative"
+                            onClick={handleAddCommand}
+                        >
+                            <span className="sr-only">{`Add New Command`}</span>
+                            <Plus />
+                        </Button>
+                    )}
                 </CardHeader>
                 <ScrollArea>
                     <CardContent className="flex flex-grow flex-col gap-1 p-2">
