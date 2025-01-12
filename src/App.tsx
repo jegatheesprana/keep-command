@@ -1,9 +1,7 @@
 import { useRoutes } from "react-router-dom";
-import { Github } from "lucide-react";
 import "./App.css";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { ThemeProvider } from "./components/theme-provider";
-import { Button } from "./components/ui/button";
 import routes from "./router";
 
 function App() {
