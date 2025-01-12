@@ -21,7 +21,7 @@ export default function AddCategory({ category, open, onClose, onSuccess }: AddC
 
     useEffect(() => {
         setValues(category);
-    }, [category]);
+    }, [category, open]);
 
     return (
         <div

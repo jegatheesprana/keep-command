@@ -78,7 +78,6 @@ export default function CommandCard({
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        console.log(e);
         setValues((prev) => ({
             ...prev,
             [e.target.name]: e.target.value,
@@ -115,7 +114,7 @@ export default function CommandCard({
 
     useEffect(() => {
         setValues(command);
-    }, [command]);
+    }, [command, isEditing]);
 
     return (
         <>
