@@ -19,12 +19,12 @@ function App() {
                             </a>
                         </Button> */}
                         <div />
-                        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+                        <h4 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl">
                             Keep Commands
-                        </h1>
+                        </h4>
                         <ThemeToggle />
                     </header>
-                    <main className="flex flex-grow mx-4 flex-col gap-6">{content}</main>
+                    <main className="flex flex-grow mx-4 mb-4 flex-col gap-6">{content}</main>
                 </div>
             </ThemeProvider>
         </>

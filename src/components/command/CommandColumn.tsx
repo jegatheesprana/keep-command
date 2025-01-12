@@ -45,18 +45,15 @@ export default function CommandColumn({ commands, isOverlay, onModifyCommand, on
         transform: CSS.Translate.toString(transform),
     };
 
-    const variants = cva(
-        "h-[500px] max-h-[500px] flex-1 max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
-        {
-            variants: {
-                dragging: {
-                    default: "border-2 border-transparent",
-                    over: "ring-2 opacity-30",
-                    overlay: "ring-2 ring-primary",
-                },
+    const variants = cva("h-full flex-1 max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center", {
+        variants: {
+            dragging: {
+                default: "border-2 border-transparent",
+                over: "ring-2 opacity-30",
+                overlay: "ring-2 ring-primary",
             },
-        }
-    );
+        },
+    });
 
     const handleAddCommand = () => {
         setAddingCommand(true);

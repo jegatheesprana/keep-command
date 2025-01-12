@@ -68,8 +68,15 @@ export default function KanbanBoard() {
     useEffect(() => {
         if (!categoryId && categories.length) {
             navigate(`/${categories[0].id}`);
+        } else if (categoryId) {
+            const category = categories.find((category) => category.id === categoryId);
+            if (!category && categories.length) {
+                navigate(`/${categories[0].id}`);
+            } else if (!category) {
+                navigate("/");
+            }
         }
-    }, []);
+    }, [categoryId, categories]);
 
     function getDraggingTaskData(itemId: UniqueIdentifier, columnType: ColumnType) {
         const itemsInColumn = columnType === ColumnType.Category ? categories : commands;
@@ -162,9 +169,6 @@ export default function KanbanBoard() {
     }
 
     function removeCategory(category: Category): void {
-        if (category.id === categoryId) {
-            navigate("/");
-        }
         setCategories((categories) => categories.filter((_category) => _category.id !== category.id));
     }
 

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export default function BoardContainer({ children, className }: { children: React.ReactNode; className?: string }) {
     const dndContext = useDndContext();
 
-    const variations = cva("px-2 md:px-0 flex lg:justify-center pb-4", {
+    const variations = cva("h-full px-2 md:px-0 flex lg:justify-center pb-4", {
         variants: {
             dragging: {
                 default: "snap-x snap-mandatory",
@@ -21,7 +21,9 @@ export default function BoardContainer({ children, className }: { children: Reac
                 dragging: dndContext.active ? "active" : "default",
             })}
         >
-            <div className={cn("flex gap-4 items-center flex-row justify-center", className || "")}>{children}</div>
+            <div className={cn("h-full flex gap-4 items-center flex-row justify-center", className || "")}>
+                {children}
+            </div>
             <ScrollBar orientation="horizontal" />
         </ScrollArea>
     );
