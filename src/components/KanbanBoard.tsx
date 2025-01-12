@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate, Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import BoardContainer from "./BoardColumn";
 import CategoryColumn from "./category/CategoryColumn";
@@ -234,6 +234,10 @@ export default function KanbanBoard() {
         });
     }
 
+    function removeCategory(category: Category): void {
+        setCategories((categories) => categories.filter((_category) => _category.id !== category.id));
+    }
+
     function modifyCommand(categoryId: UniqueIdentifier, id: UniqueIdentifier, command: Command): void {
         setCategories((categories) => {
             const categoryIndex = categories.findIndex((category) => category.id === categoryId);
@@ -276,13 +280,21 @@ export default function KanbanBoard() {
                 <SortableContext items={[ColumnType.Category, ColumnType.Command]}>
                     {leftColumn === ColumnType.Category ? (
                         <>
-                            <CategoryColumn categories={categories} modifyCategory={modifyCategory} />
+                            <CategoryColumn
+                                categories={categories}
+                                modifyCategory={modifyCategory}
+                                onDeleteClick={removeCategory}
+                            />
                             <CommandColumn commands={commands} />
                         </>
                     ) : (
                         <>
                             <CommandColumn commands={commands} />
-                            <CategoryColumn categories={categories} modifyCategory={modifyCategory} />
+                            <CategoryColumn
+                                categories={categories}
+                                modifyCategory={modifyCategory}
+                                onDeleteClick={removeCategory}
+                            />
                         </>
                     )}
                 </SortableContext>
@@ -292,7 +304,12 @@ export default function KanbanBoard() {
                 createPortal(
                     <DragOverlay>
                         {activeColumn === ColumnType.Category ? (
-                            <CategoryColumn isOverlay categories={categories} modifyCategory={modifyCategory} />
+                            <CategoryColumn
+                                isOverlay
+                                categories={categories}
+                                modifyCategory={modifyCategory}
+                                onDeleteClick={removeCategory}
+                            />
                         ) : activeColumn === ColumnType.Command ? (
                             <CommandColumn isOverlay commands={commands} />
                         ) : null}

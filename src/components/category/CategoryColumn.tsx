@@ -11,10 +11,11 @@ import { type Category, type ColumnDragData, ColumnType } from "../types";
 import AddCategory from "./AddCategory";
 import { UniqueIdentifier } from "@dnd-kit/core";
 
-interface BoardColumnProps {
+interface CategoryColumnProps {
     categories: Category[];
     isOverlay?: boolean;
     modifyCategory: (id: UniqueIdentifier, category: Category) => void;
+    onDeleteClick?: (category: Category) => void;
 }
 
 const emptyCategory: Category = {
@@ -24,7 +25,7 @@ const emptyCategory: Category = {
     commands: [],
 };
 
-export default function CategoryColumn({ categories, isOverlay, modifyCategory }: BoardColumnProps) {
+export default function CategoryColumn({ categories, isOverlay, modifyCategory, onDeleteClick }: CategoryColumnProps) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalData, setModalData] = useState<Category>(emptyCategory);
     const categoryIds = useMemo(() => {
@@ -65,6 +66,11 @@ export default function CategoryColumn({ categories, isOverlay, modifyCategory }
 
     const handleAddCategory = () => {
         setModalData(emptyCategory);
+        setModalOpen(true);
+    };
+
+    const handleEditCategory = (category: Category) => {
+        setModalData(category);
         setModalOpen(true);
     };
 
@@ -109,7 +115,12 @@ export default function CategoryColumn({ categories, isOverlay, modifyCategory }
                     <CardContent className="flex flex-grow flex-col gap-2 p-2">
                         <SortableContext items={categoryIds}>
                             {categories.map((category) => (
-                                <CategoryCard key={category.id} category={category} />
+                                <CategoryCard
+                                    key={category.id}
+                                    category={category}
+                                    onEditClick={handleEditCategory}
+                                    onDeleteClick={onDeleteClick}
+                                />
                             ))}
                         </SortableContext>
                     </CardContent>
