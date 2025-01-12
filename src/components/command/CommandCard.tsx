@@ -100,10 +100,7 @@ export default function CommandCard({ command, isOverlay }: TaskCardProps) {
                     <div className="flex items-center">
                         {/* Copy Button */}
                         <div className="rounded-md px-1 py-2" onClick={handleCopy}>
-                            <Button
-                                variant={"ghost"}
-                                className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
-                            >
+                            <Button variant={"ghost"} className="p-1 text-secondary-foreground/50 -ml-2 h-auto">
                                 <span className="sr-only">Move command</span>
                                 {copied ? <CopyCheck size={20} /> : <Copy size={20} />}
                             </Button>
@@ -111,10 +108,7 @@ export default function CommandCard({ command, isOverlay }: TaskCardProps) {
 
                         {/* Action Button */}
                         <div className="rounded-md px-1 py-2" onClick={handleShowMore}>
-                            <Button
-                                variant={"ghost"}
-                                className="p-1 text-secondary-foreground/50 -ml-2 h-auto cursor-grab"
-                            >
+                            <Button variant={"ghost"} className="p-1 text-secondary-foreground/50 -ml-2 h-auto">
                                 <span className="sr-only">Move command</span>
                                 {showMore ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                             </Button>

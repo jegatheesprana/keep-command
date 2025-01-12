@@ -6,6 +6,7 @@ import { cva } from "class-variance-authority";
 import { GripVertical, HelpCircle, MoreVertical } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { ColumnType, type TaskDragData, type Category } from "../types";
+import { Link } from "react-router-dom";
 
 interface TaskCardProps {
     category: Category;
@@ -66,7 +67,9 @@ export default function CategoryCard({ category, isOverlay }: TaskCardProps) {
                     </Button>
                 </div>
             </CardHeader>
-            <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">{category.title}</CardContent>
+            <CardContent className="px-3 pt-3 pb-6 text-left whitespace-pre-wrap">
+                <Link to={`/${category.id}`}>{category.title}</Link>
+            </CardContent>
         </Card>
     );
 }

@@ -1,5 +1,6 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 
 import BoardContainer from "./BoardColumn";
 import CategoryColumn from "./category/CategoryColumn";
@@ -110,17 +111,18 @@ const initialCategories: Category[] = [
     },
 ];
 
-const initialCommands: Command[] = [];
-
-export function KanbanBoard() {
+export default function KanbanBoard() {
     const [leftColumn, setLeftColumn] = useState<ColumnType>(ColumnType.Category);
     const pickedUpTaskColumn = useRef<ColumnType | null>(null);
 
+    const navigate = useNavigate();
+    const { categoryId } = useParams();
+
     const [categories, setCategories] = useState<Category[]>(initialCategories);
-    const [selectedCategory, setSelectedCategory] = useState<number>(0);
     const commands = useMemo(() => {
-        return categories[selectedCategory]?.commands || [];
-    }, [categories, selectedCategory]);
+        const selectedCategory = categories.find((category) => category.id === categoryId);
+        return selectedCategory?.commands || [];
+    }, [categories, categoryId]);
 
     const [activeColumn, setActiveColumn] = useState<string | null>(null);
 
@@ -133,6 +135,12 @@ export function KanbanBoard() {
             coordinateGetter: coordinateGetter,
         })
     );
+
+    useEffect(() => {
+        if (!categoryId) {
+            navigate(`/${categories[0].id}`);
+        }
+    }, []);
 
     function getDraggingTaskData(itemId: UniqueIdentifier, columnType: ColumnType) {
         const itemsInColumn = columnType === ColumnType.Category ? categories : commands;
@@ -340,7 +348,11 @@ export function KanbanBoard() {
                 });
             } else {
                 setCategories((categories) => {
-                    const commands = categories[selectedCategory].commands || [];
+                    const selectedCategoryIndex = categories.findIndex((category) => category.id === categoryId);
+
+                    if (selectedCategoryIndex < 0) return categories;
+
+                    const commands = categories[selectedCategoryIndex].commands || [];
 
                     const activeIndex = commands.findIndex((t) => t.id === activeId);
                     const overIndex = commands.findIndex((t) => t.id === overId);
@@ -348,7 +360,7 @@ export function KanbanBoard() {
                     const moved = arrayMove(commands, activeIndex, overIndex);
 
                     return categories.map((category, index) => {
-                        if (index === selectedCategory) {
+                        if (index === selectedCategoryIndex) {
                             return {
                                 ...category,
                                 commands: moved,

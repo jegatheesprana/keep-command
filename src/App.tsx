@@ -1,11 +1,13 @@
+import { useRoutes } from "react-router-dom";
 import { Github } from "lucide-react";
 import "./App.css";
-import { KanbanBoard } from "./components/KanbanBoard";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { ThemeProvider } from "./components/theme-provider";
 import { Button } from "./components/ui/button";
+import routes from "./router";
 
 function App() {
+    const content = useRoutes(routes);
     return (
         <>
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -22,9 +24,7 @@ function App() {
                         </h1>
                         <ThemeToggle />
                     </header>
-                    <main className="mx-4 flex flex-col gap-6">
-                        <KanbanBoard />
-                    </main>
+                    <main className="mx-4 flex flex-col gap-6">{content}</main>
                 </div>
             </ThemeProvider>
         </>
