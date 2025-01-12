@@ -1,8 +1,9 @@
 import { useDndContext } from "@dnd-kit/core";
 import { cva } from "class-variance-authority";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
+import { cn } from "@/lib/utils";
 
-export default function BoardContainer({ children }: { children: React.ReactNode }) {
+export default function BoardContainer({ children, className }: { children: React.ReactNode; className?: string }) {
     const dndContext = useDndContext();
 
     const variations = cva("px-2 md:px-0 flex lg:justify-center pb-4", {
@@ -20,7 +21,7 @@ export default function BoardContainer({ children }: { children: React.ReactNode
                 dragging: dndContext.active ? "active" : "default",
             })}
         >
-            <div className="flex gap-4 items-center flex-row justify-center">{children}</div>
+            <div className={cn("flex gap-4 items-center flex-row justify-center", className || "")}>{children}</div>
             <ScrollBar orientation="horizontal" />
         </ScrollArea>
     );

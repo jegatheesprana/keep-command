@@ -26,6 +26,8 @@ import CategoryCard from "./category/CategoryCard";
 import CommandCard from "./command/CommandCard";
 import { type Category, type Column, ColumnType, type Command } from "./types";
 
+import { v4 as uuidv4 } from "uuid";
+
 const categoryColumn: Column = {
     id: ColumnType.Category,
     title: "Category",
@@ -220,6 +222,46 @@ export default function KanbanBoard() {
         },
     };
 
+    function modifyCategory(id: UniqueIdentifier, category: Category): void {
+        setCategories((categories) => {
+            const index = categories.findIndex((category) => category.id === id);
+            if (index === -1) {
+                const newId = uuidv4();
+                navigate(`/${newId}`);
+                return [{ ...category, id: newId }, ...categories];
+            }
+            return [...categories.slice(0, index), category, ...categories.slice(index + 1)];
+        });
+    }
+
+    function modifyCommand(categoryId: UniqueIdentifier, id: UniqueIdentifier, command: Command): void {
+        setCategories((categories) => {
+            const categoryIndex = categories.findIndex((category) => category.id === categoryId);
+            if (categoryIndex === -1) return categories;
+            const category = categories[categoryIndex];
+            const commandIndex = category.commands.findIndex((command) => command.id === id);
+            if (commandIndex === -1) {
+                const newId = uuidv4();
+                const updatedCommands = [...category.commands, { ...command, id: newId }];
+                const updatedCategory = {
+                    ...category,
+                    commands: updatedCommands,
+                };
+                return [...categories.slice(0, categoryIndex), updatedCategory, ...categories.slice(categoryIndex + 1)];
+            }
+            const updatedCommands = [
+                ...category.commands.slice(0, commandIndex),
+                command,
+                ...category.commands.slice(commandIndex + 1),
+            ];
+            const updatedCategory = {
+                ...category,
+                commands: updatedCommands,
+            };
+            return [...categories.slice(0, categoryIndex), updatedCategory, ...categories.slice(categoryIndex + 1)];
+        });
+    }
+
     return (
         <DndContext
             accessibility={{
@@ -234,13 +276,13 @@ export default function KanbanBoard() {
                 <SortableContext items={[ColumnType.Category, ColumnType.Command]}>
                     {leftColumn === ColumnType.Category ? (
                         <>
-                            <CategoryColumn categories={categories} />
+                            <CategoryColumn categories={categories} modifyCategory={modifyCategory} />
                             <CommandColumn commands={commands} />
                         </>
                     ) : (
                         <>
                             <CommandColumn commands={commands} />
-                            <CategoryColumn categories={categories} />
+                            <CategoryColumn categories={categories} modifyCategory={modifyCategory} />
                         </>
                     )}
                 </SortableContext>
@@ -250,7 +292,7 @@ export default function KanbanBoard() {
                 createPortal(
                     <DragOverlay>
                         {activeColumn === ColumnType.Category ? (
-                            <CategoryColumn isOverlay categories={categories} />
+                            <CategoryColumn isOverlay categories={categories} modifyCategory={modifyCategory} />
                         ) : activeColumn === ColumnType.Command ? (
                             <CommandColumn isOverlay commands={commands} />
                         ) : null}
