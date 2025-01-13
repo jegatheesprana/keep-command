@@ -1,0 +1,14 @@
+{
+    "category": {
+        "singlularSimple": "group",
+        "pluralSimple": "groups",
+        "singularCaps": "Group",
+        "pluralCaps": "Groups"
+    },
+    "command": {
+        "singlularSimple": "command",
+        "pluralSimple": "commands",
+        "singularCaps": "Command",
+        "pluralCaps": "Commands"
+    }
+}

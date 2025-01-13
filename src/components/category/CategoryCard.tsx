@@ -10,6 +10,7 @@ import Action from "./Action";
 import DeleteAlert from "../DeleteAlert";
 import { useState } from "react";
 import InfoCard from "./InfoCard";
+import displayNames from "../../displayNames.json";
 
 interface CategoryCardProps {
     category: Category;
@@ -96,8 +97,14 @@ export default function CategoryCard({ category, isOverlay, onEditClick, onDelet
             <DeleteAlert
                 open={deleteAlert}
                 onOpenChange={setDeleteAlert}
-                title="Delete Category"
-                description="Are you sure? This category will be deleted permanently."
+                title={`Delete ${displayNames.category.singularCaps}`}
+                description={`Are you sure? ${
+                    category.title
+                        ? `${displayNames.category.singlularSimple}: '${category.title}'`
+                        : `This ${displayNames.category.singlularSimple}`
+                } will be deleted permanently. The ${category.commands.length} ${
+                    displayNames.command.pluralSimple
+                } under this ${displayNames.category.singlularSimple} will also be deleted.`}
                 onDelete={handleDeleteSuccess}
             />
         </>

@@ -11,6 +11,7 @@ import { Category, type ColumnDragData, ColumnType, type Command } from "../type
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { Link, useParams } from "react-router-dom";
 import Alert from "./Alert";
+import displayNames from "../../displayNames.json";
 
 interface BoardColumnProps {
     category: Category | null;
@@ -123,21 +124,21 @@ export default function CommandColumn({ category, isOverlay, onModifyCommand, on
                             )}
                             {!category && (
                                 <Alert
-                                    title="No category has been added!"
-                                    message="Create a new category and start saving commands."
+                                    title={`No ${displayNames.category.singlularSimple} has been created!`}
+                                    message={`Create a new ${displayNames.category.singlularSimple} and start saving commands.`}
                                 >
                                     <Button variant="outline">
-                                        <Link to="?new=1">Add New Category</Link>
+                                        <Link to="?new=1">Create New {displayNames.category.singularCaps}</Link>
                                     </Button>
                                 </Alert>
                             )}
                             {category && !category.commands.length && !addingCommand && (
                                 <Alert
-                                    title="No commands have been added!"
-                                    message="Add a new command by clicking on the plus icon."
+                                    title={`No ${displayNames.command.pluralSimple} have been added!`}
+                                    message={`Add a new ${displayNames.command.singlularSimple} by clicking on the plus icon.`}
                                 >
                                     <Button variant="outline" onClick={handleAddCommand}>
-                                        Add New Command
+                                        Add New {displayNames.command.singularCaps}
                                     </Button>
                                 </Alert>
                             )}

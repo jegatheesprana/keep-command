@@ -17,7 +17,7 @@ function App() {
                             </a>
                         </Button> */}
                         <div />
-                        <h4 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl">
+                        <h4 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-4xl text-gray-600 dark:text-gray-400">
                             Keep Commands
                         </h4>
                         <ThemeToggle />
