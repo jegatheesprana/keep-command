@@ -11,12 +11,15 @@ import { type Category, type ColumnDragData, ColumnType } from "../types";
 import AddCategory from "./AddCategory";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { useSearchParams } from "react-router-dom";
+import { SearchInput } from "../ui/input";
 
 interface CategoryColumnProps {
     categories: Category[];
     isOverlay?: boolean;
     modifyCategory: (id: UniqueIdentifier, category: Category) => void;
     onDeleteClick?: (category: Category) => void;
+    filterKeyword?: string;
+    setFilterKeyword?: (keyword: string) => void;
 }
 
 const emptyCategory: Category = {
@@ -26,7 +29,14 @@ const emptyCategory: Category = {
     commands: [],
 };
 
-export default function CategoryColumn({ categories, isOverlay, modifyCategory, onDeleteClick }: CategoryColumnProps) {
+export default function CategoryColumn({
+    categories,
+    isOverlay,
+    modifyCategory,
+    onDeleteClick,
+    filterKeyword,
+    setFilterKeyword,
+}: CategoryColumnProps) {
     const [searchParams, setSearchParams] = useSearchParams();
     const modalOpen = searchParams.get("new") === "1";
     const [modalData, setModalData] = useState<Category>(emptyCategory);
@@ -114,6 +124,13 @@ export default function CategoryColumn({ categories, isOverlay, modifyCategory, 
                         <Plus />
                     </Button>
                 </CardHeader>
+                <div className="px-2 py-1">
+                    <SearchInput
+                        placeholder="Type keyword to filter"
+                        value={filterKeyword || ""}
+                        onChangeValue={setFilterKeyword}
+                    />
+                </div>
                 <ScrollArea>
                     <CardContent className="flex flex-grow flex-col gap-2 p-2">
                         <SortableContext items={categoryIds}>

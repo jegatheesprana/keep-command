@@ -41,6 +41,20 @@ const commandColumn: Column = {
 const DATA_VERSION = "1";
 const DATA_KEY = `data-v${DATA_VERSION}`;
 
+const applyFilters = (categories: Category[], keyword: string): Category[] => {
+    return categories.filter((category) => {
+        if (keyword) {
+            let compareTo: string = category.title + " " + category.description;
+            for (let command of category.commands) {
+                compareTo += " " + command.command + " " + command.description;
+            }
+            return compareTo.toLocaleLowerCase().includes(keyword.toLocaleLowerCase());
+        }
+
+        return true;
+    });
+};
+
 export default function KanbanBoard() {
     const [leftColumn, setLeftColumn] = useState<ColumnType>(ColumnType.Category);
     const pickedUpTaskColumn = useRef<ColumnType | null>(null);
@@ -53,6 +67,9 @@ export default function KanbanBoard() {
         () => categories.find((category) => category.id === categoryId) ?? null,
         [categories, categoryId]
     );
+
+    const [filterKeyword, setFilterKeyword] = useState<string>("");
+    const filteredCategories = useMemo(() => applyFilters(categories, filterKeyword), [categories, filterKeyword]);
 
     const [activeColumn, setActiveColumn] = useState<string | null>(null);
 
@@ -167,7 +184,7 @@ export default function KanbanBoard() {
             const index = categories.findIndex((category) => category.id === id);
             if (index === -1) {
                 const newId = uuidv4();
-                navigate(`/${newId}`);
+                setTimeout(() => navigate(`/${newId}`));
                 return [{ ...category, id: newId }, ...categories];
             }
             return [...categories.slice(0, index), category, ...categories.slice(index + 1)];
@@ -240,9 +257,11 @@ export default function KanbanBoard() {
                     {leftColumn === ColumnType.Category ? (
                         <>
                             <CategoryColumn
-                                categories={categories}
+                                categories={filteredCategories}
                                 modifyCategory={modifyCategory}
                                 onDeleteClick={removeCategory}
+                                filterKeyword={filterKeyword}
+                                setFilterKeyword={setFilterKeyword}
                             />
                             <CommandColumn
                                 category={selectedCategory}
@@ -258,9 +277,11 @@ export default function KanbanBoard() {
                                 onDeleteClick={removeCommand}
                             />
                             <CategoryColumn
-                                categories={categories}
+                                categories={filteredCategories}
                                 modifyCategory={modifyCategory}
                                 onDeleteClick={removeCategory}
+                                filterKeyword={filterKeyword}
+                                setFilterKeyword={setFilterKeyword}
                             />
                         </>
                     )}
@@ -273,9 +294,10 @@ export default function KanbanBoard() {
                         {activeColumn === ColumnType.Category ? (
                             <CategoryColumn
                                 isOverlay
-                                categories={categories}
+                                categories={filteredCategories}
                                 modifyCategory={modifyCategory}
                                 onDeleteClick={removeCategory}
+                                filterKeyword=""
                             />
                         ) : activeColumn === ColumnType.Command ? (
                             <CommandColumn isOverlay category={selectedCategory} onModifyCommand={modifyCommand} />

@@ -1,5 +1,7 @@
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
+import { Button } from "./button";
+import { X } from "lucide-react";
 
 /**
  * Input
@@ -29,3 +31,30 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({ className, type
     );
 });
 Input.displayName = "Input";
+
+type SearchInputProps = InputProps & {
+    onChangeValue?: (value: string) => void;
+};
+
+export function SearchInput({ onChangeValue, className, onChange, ...props }: SearchInputProps) {
+    function handleClick() {
+        if (onChangeValue) onChangeValue("");
+    }
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (onChangeValue) onChangeValue(e.target.value);
+    };
+
+    return (
+        <div className="relative">
+            <Input data-component="input-password" onChange={onChange || handleChange} {...props} />
+            <Button
+                variant="ghost"
+                onClick={handleClick}
+                className={cn("height-[inherit] absolute inset-y-0 right-0 my-0 me-0 font-mono")}
+            >
+                <X size={20} />
+            </Button>
+        </div>
+    );
+}
