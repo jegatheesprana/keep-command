@@ -6,7 +6,7 @@ import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { GripVertical, Plus } from "lucide-react";
-import { ScrollArea } from "../ui/scroll-area";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Category, type ColumnDragData, ColumnType, type Command } from "../types";
 import { UniqueIdentifier } from "@dnd-kit/core";
 import { Link, useParams } from "react-router-dom";
@@ -48,15 +48,18 @@ export default function CommandColumn({ category, isOverlay, onModifyCommand, on
         transform: CSS.Translate.toString(transform),
     };
 
-    const variants = cva("h-full flex-1 max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center", {
-        variants: {
-            dragging: {
-                default: "border-2 border-transparent",
-                over: "ring-2 opacity-30",
-                overlay: "ring-2 ring-primary",
+    const variants = cva(
+        "h-full overflow-hidden flex-1 max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+        {
+            variants: {
+                dragging: {
+                    default: "border-2 border-transparent",
+                    over: "ring-2 opacity-30",
+                    overlay: "ring-2 ring-primary",
+                },
             },
-        },
-    });
+        }
+    );
 
     const handleAddCommand = () => {
         setAddingCommand(true);
@@ -102,7 +105,10 @@ export default function CommandColumn({ category, isOverlay, onModifyCommand, on
                         </Button>
                     )}
                 </CardHeader>
-                <ScrollArea className="h-full">
+                <ScrollArea
+                    className="h-full"
+                    asChild={!category || (category && !category.commands.length && !addingCommand)}
+                >
                     <CardContent className="h-full flex flex-grow flex-col gap-1 p-2">
                         <SortableContext items={commandIds}>
                             {category &&
@@ -144,6 +150,7 @@ export default function CommandColumn({ category, isOverlay, onModifyCommand, on
                             )}
                         </SortableContext>
                     </CardContent>
+                    <ScrollBar />
                 </ScrollArea>
             </Card>
         </>

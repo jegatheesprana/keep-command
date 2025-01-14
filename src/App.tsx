@@ -22,7 +22,7 @@ function App() {
                         </h4>
                         <ThemeToggle />
                     </header>
-                    <main className="flex flex-grow mx-4 mb-4 flex-col gap-6">{content}</main>
+                    <main className="flex flex-grow mx-4 mb-4 flex-col gap-6 overflow-hidden">{content}</main>
                 </div>
             </ThemeProvider>
         </>

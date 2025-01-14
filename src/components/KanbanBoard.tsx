@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate, useParams } from "react-router-dom";
 
-import BoardContainer from "./BoardColumn";
 import CategoryColumn from "./category/CategoryColumn";
 import CommandColumn from "./command/CommandColumn";
 import {
@@ -252,7 +251,7 @@ export default function KanbanBoard() {
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
         >
-            <BoardContainer>
+            <div className="h-full flex gap-4 items-center flex-row justify-center">
                 <SortableContext items={[ColumnType.Category, ColumnType.Command]}>
                     {leftColumn === ColumnType.Category ? (
                         <>
@@ -286,7 +285,7 @@ export default function KanbanBoard() {
                         </>
                     )}
                 </SortableContext>
-            </BoardContainer>
+            </div>
 
             {"document" in window &&
                 createPortal(

@@ -6,7 +6,7 @@ import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Button } from "../ui/button";
 import { GripVertical, Plus } from "lucide-react";
-import { ScrollArea } from "../ui/scroll-area";
+import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { type Category, type ColumnDragData, ColumnType } from "../types";
 import AddCategory from "./AddCategory";
 import { UniqueIdentifier } from "@dnd-kit/core";
@@ -67,15 +67,18 @@ export default function CategoryColumn({
         setSearchParams({ new: value ? "1" : "0" });
     };
 
-    const variants = cva("h-full w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center", {
-        variants: {
-            dragging: {
-                default: "border-2 border-transparent",
-                over: "ring-2 opacity-30",
-                overlay: "ring-2 ring-primary",
+    const variants = cva(
+        "h-full overflow-hidden w-[350px] max-w-full bg-primary-foreground flex flex-col flex-shrink-0 snap-center",
+        {
+            variants: {
+                dragging: {
+                    default: "border-2 border-transparent",
+                    over: "ring-2 opacity-30",
+                    overlay: "ring-2 ring-primary",
+                },
             },
-        },
-    });
+        }
+    );
 
     const handleAddCategory = () => {
         setModalData(emptyCategory);
@@ -144,6 +147,7 @@ export default function CategoryColumn({
                             ))}
                         </SortableContext>
                     </CardContent>
+                    <ScrollBar />
                 </ScrollArea>
             </Card>
             <AddCategory category={modalData} open={modalOpen} onClose={handleClose} onSuccess={handleSuccess} />
