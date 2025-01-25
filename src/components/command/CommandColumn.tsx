@@ -131,7 +131,7 @@ export default function CommandColumn({ category, isOverlay, onModifyCommand, on
                             {!category && (
                                 <Alert
                                     title={`No ${displayNames.category.singlularSimple} has been created!`}
-                                    message={`Create a new ${displayNames.category.singlularSimple} and start saving commands.`}
+                                    message={`${displayNames.command.pluralCaps} are organized under ${displayNames.category.pluralSimple}. Create a new ${displayNames.category.singlularSimple} and start saving commands.`}
                                 >
                                     <Button variant="outline">
                                         <Link to="?new=1">Create New {displayNames.category.singularCaps}</Link>
